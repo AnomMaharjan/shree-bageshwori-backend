@@ -11,4 +11,9 @@ function validatePlan(plan) {
     return schema.validate(plan)
 }
 
+
+function validateUpdatePlan(plan){
+    
+}
+
 export { validatePlan }
