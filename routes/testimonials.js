@@ -22,7 +22,7 @@ testimonialRouter.post('/', auth, async (req, res) => {
 
         const testimonial = new Testimonial({
             name: req.body.name,
-            description: req.body.description,
+            review: req.body.review,
             image: req.body.image,
             rating: req.body.rating,
             location: req.body.location
