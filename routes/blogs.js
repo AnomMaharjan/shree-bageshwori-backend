@@ -8,7 +8,7 @@ const blogsRouter = Router()
 
 blogsRouter.get('/', async (req, res) => {
     try {
-        const blogs = await Blog.find().sort('createdAt')
+        const blogs = await Blog.find().sort('-createdAt')
         res.status(200).send({ error: false, blogs })
     }
     catch (ex) {
