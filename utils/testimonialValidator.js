@@ -2,10 +2,10 @@ import Joi from "joi";
 
 function validateTestimonial(testimonial) {
     const schema = Joi.object({
-        name: Joi.string().required().label('Name'),
-        rating: Joi.number().required().label('Rating'),
-        review: Joi.string().required().label('Description'),
-        location: Joi.string().required().label('Location'),
+        name: Joi.string().required().label('name'),
+        rating: Joi.number().required().label('rating'),
+        review: Joi.string().required().label('review'),
+        location: Joi.string().required().label('location'),
         image: Joi.string()
     })
 

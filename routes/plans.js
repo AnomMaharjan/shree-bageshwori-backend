@@ -49,11 +49,7 @@ plansRouter.put('/:id', auth, async (req, res) => {
         let plan = await Plan.findByIdAndUpdate(req.params.id, { ...req.body }, { new: true })
         if (!plan) return res.status(404).send({ status: false, msg: 'Plan with the given id not found' })
 
-        // plan = Plan({
-        //     ...req.body
-        // })
 
-        // await plan.save()
         return res.status(200).send({ status: true, plan })
     }
     catch (err) {
