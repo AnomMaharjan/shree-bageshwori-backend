@@ -16,7 +16,7 @@ router.post("/", async (req, res) => {
   verifyRefreshToken(req.body.refreshToken)
     .then(({ tokenDetails }) => {
 
-      const payload = { _id: tokenDetails._id };
+      const payload = { _id: tokenDetails._id, };
       const accessToken = jwt.sign(
         payload,
         process.env.ACCESS_TOKEN_PRIVATE_KEY,

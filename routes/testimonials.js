@@ -32,6 +32,7 @@ testimonialRouter.post('/', auth, async (req, res) => {
         return res.status(201).send({ status: true, testimonial })
     }
     catch (err) {
+        console.log(err)
         return res.status(500).send({ error: true, message: "Internal Server Error." })
     }
 })
@@ -42,14 +43,9 @@ testimonialRouter.put('/:id', auth, async (req, res) => {
         const { error } = validateTestimonial(req.body)
         if (error) return res.status(400).send({ status: false, msg: error.details[0].message })
 
-        let testimonial = await Testimonial.findByIdAndUpdate(req.params.id, { ...req.body }, { new: true })
+        let testimonial = await Testimonial.findByIdAndUpdate(req.params.id, { ...req.body, createdAt: Date.now() }, { new: true })
         if (!testimonial) return res.status(404).send({ status: false, msg: 'Testimonial with the given id not found' })
 
-        // testimonial = testimonial({
-        //     ...req.body
-        // })
-
-        // await testimonial.save()
         return res.status(200).send({ status: true, testimonial })
     }
     catch (err) {

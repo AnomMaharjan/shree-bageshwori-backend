@@ -2,6 +2,7 @@ import { Router } from "express";
 import auth from "../middleware/auth.js";
 import validateBlog from "../utils/blogsValidator.js";
 import Blog from "../models/Blog.js";
+import { upload, uploadBlogsPhotos } from "../utils/cloudinaryHelper.js";
 
 const blogsRouter = Router()
 
@@ -17,17 +18,28 @@ blogsRouter.get('/', async (req, res) => {
 })
 
 
-blogsRouter.post('/', auth, async (req, res) => {
+blogsRouter.post('/', auth, upload.array('image'), async (req, res) => {
     try {
         const { error } = validateBlog(req.body)
         if (error) return res.status(400).send({ error: true, message: error.details[0].message })
 
-        const post = new Blog({ ...req.body })
-        await post.save()
+        var imageURLs = []
+        if (req.files.length !== 0) {
+            for (var i = 0; i < req.files.length; i++) {
+                const buf = Buffer.from(req.files[i].buffer).toString('base64')
+                let dataURI = "data:" + req.files[i].mimetype + ";base64," + buf
+                let cldRes = await uploadBlogsPhotos(dataURI);
+                imageURLs.push(cldRes.secure_url)
+            }
+        }
 
-        return res.status(201).send({ error: false, post })
+        const blog = new Blog({ ...req.body, image: imageURLs })
+        await blog.save()
+
+        return res.status(201).send({ error: false, blog })
 
     } catch (ex) {
+        console.log(ex)
         return res.status(500).send({ error: true, message: "Internal server error." })
     }
 })
@@ -36,7 +48,7 @@ blogsRouter.post('/', auth, async (req, res) => {
 blogsRouter.put('/:id', auth, async (req, res) => {
     try {
 
-        const blog = await Blog.findByIdAndUpdate(req.params.id, { ...req.body }, { new: true })
+        const blog = await Blog.findByIdAndUpdate(req.params.id, { ...req.body, createdAt: Date.now() }, { new: true })
         if (!blog) return res.status(404).send({ error: true, message: "Blog with the given ID not found." })
 
         const { error } = validateBlog(req.body)

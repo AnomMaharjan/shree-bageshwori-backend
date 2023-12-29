@@ -14,9 +14,10 @@ const auth = async (req, res, next) => {
         req.user = tokenDetails;
         next();
     } catch (err) {
+        console.log(err)
         return res
             .status(403)
-            .json({ error: true, message: "Access Denied: No token provided." });
+            .json({ error: true, message: "Access Denied: No token provided Here." });
     }
 }
 
