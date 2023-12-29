@@ -1,13 +1,13 @@
 import Joi from "joi";
 
 function bannerValidate(banner) {
-    const schema = Joi.object({
-        title: Joi.string().required(),
-        description: Joi.string(),
-        imageUrl: Joi.string().required()
-    })
+  const schema = Joi.object({
+    title: Joi.string().required(),
+    description: Joi.string(),
+    image: Joi.any(),
+  });
 
-    return schema.validate(banner)
+  return schema.validate(banner);
 }
 
-export { bannerValidate }
+export { bannerValidate };
