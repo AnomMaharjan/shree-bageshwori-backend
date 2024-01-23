@@ -18,8 +18,13 @@ const testimonialSchema = new mongoose.Schema({
         required: true
     },
     image: {
-        type: String,
-        required: true
+        imageUrl: {
+            type: String,
+            required: true
+        },
+        publicId: {
+            type: String
+        }
     }
 })
 

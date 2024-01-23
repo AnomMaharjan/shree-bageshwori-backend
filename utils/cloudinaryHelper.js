@@ -18,7 +18,7 @@ export const uploadBlogsPhotos = async (file) => {
     try {
         const res = await cloudinary.uploader.upload(file, {
             resource_type: "auto",
-            // folder: "blogs",
+            folder: "blogs",
             use_filename: true
         });
         return Promise.resolve(res);
@@ -33,7 +33,7 @@ export const uploadBannerPhoto = async (file) => {
     try {
         const res = await cloudinary.uploader.upload(file, {
             resource_type: "auto",
-            // folder: "banners",
+            folder: "banners",
             use_filename: true
         });
         return Promise.resolve(res);
@@ -47,9 +47,9 @@ export const uploadFeedbackPhoto = async (file) => {
     try {
         const res = await cloudinary.uploader.upload(file, {
             resource_type: "auto",
-            // folder: "feedbacks",
-            use_filename: true
-        });
+            folder: "feedbacks",
+            use_filename: true,
+        },);
         return Promise.resolve(res);
     }
     catch (error) {

@@ -14,13 +14,20 @@ const planSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    type: {
+        type: String,
+        enum: ['Month', 'Year'],  // this is an array of values that
+    },
     offers: {
         type: [{ type: String, required: true }],
-        // default: []
     },
     createdAt: {
         type: Date,
         default: Date.now()
+    },
+    isPopular: {
+        type: Boolean,
+        default: false
     }
 })
 

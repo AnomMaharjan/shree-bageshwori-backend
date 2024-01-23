@@ -5,15 +5,17 @@ function validatePlan(plan) {
         title: Joi.string().required(),
         subtitle: Joi.string().required(),
         price: Joi.number().required(),
-        offers: Joi.array().required()
+        offers: Joi.array().required(),
+        type: Joi.string().required().valid('Month', 'Year'),
+        isPopular: Joi.boolean().default(false)
     })
 
     return schema.validate(plan)
 }
 
 
-function validateUpdatePlan(plan){
-    
+function validateUpdatePlan(plan) {
+
 }
 
 export { validatePlan }

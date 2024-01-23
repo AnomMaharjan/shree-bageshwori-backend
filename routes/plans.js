@@ -28,13 +28,16 @@ plansRouter.post('/', auth, async (req, res) => {
             title: req.body.title,
             subtitle: req.body.subtitle,
             price: req.body.price,
-            offers: req.body.offers
+            offers: req.body.offers,
+            type: req.body.type,
+            isPopular: req.body.isPopular
         })
 
         await plan.save()
         return res.status(201).send({ status: true, plan })
     }
     catch (err) {
+        console.error(err)
         return res.status(500).send({ error: true, message: "Internal Server Error." })
     }
 })

@@ -7,7 +7,14 @@ const blogSchema = new mongoose.Schema({
         type: Date,
         default: Date.now()
     },
-    image: [{ type: String }]
+    image: [{
+        imageUrl: {
+            type: String
+        },
+        publicId: {
+            type: String
+        }
+    }]
 })
 
 const Blog = new mongoose.model("Blogs", blogSchema)

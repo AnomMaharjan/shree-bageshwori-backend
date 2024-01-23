@@ -29,7 +29,7 @@ blogsRouter.post('/', auth, upload.array('image'), async (req, res) => {
                 const buf = Buffer.from(req.files[i].buffer).toString('base64')
                 let dataURI = "data:" + req.files[i].mimetype + ";base64," + buf
                 let cldRes = await uploadBlogsPhotos(dataURI);
-                imageURLs.push(cldRes.secure_url)
+                imageURLs.push({ imageUrl: cldRes.secure_url, publicId: cldRes.public_id })
             }
         }
 
@@ -45,14 +45,23 @@ blogsRouter.post('/', auth, upload.array('image'), async (req, res) => {
 })
 
 
-blogsRouter.put('/:id', auth, async (req, res) => {
+blogsRouter.put('/:id', auth, upload.array('image'), async (req, res) => {
     try {
-
-        const blog = await Blog.findByIdAndUpdate(req.params.id, { ...req.body, createdAt: Date.now() }, { new: true })
-        if (!blog) return res.status(404).send({ error: true, message: "Blog with the given ID not found." })
-
         const { error } = validateBlog(req.body)
         if (error) return res.status(400).send({ error: true, message: error.details[0].message })
+
+        var imageURLs = []
+        if (req.files.length !== 0) {
+            for (var i = 0; i < req.files.length; i++) {
+                const buf = Buffer.from(req.files[i].buffer).toString('base64')
+                let dataURI = "data:" + req.files[i].mimetype + ";base64," + buf
+                let cldRes = await uploadBlogsPhotos(dataURI);
+                imageURLs.push({ imageUrl: cldRes.secure_url, publicId: cldRes.public_id })
+            }
+        }
+
+        const blog = await Blog.findByIdAndUpdate(req.params.id, { ...req.body, image: imageURLs, createdAt: Date.now() }, { new: true })
+        if (!blog) return res.status(404).send({ error: true, message: "Blog with the given ID not found." })
 
         return res.status(201).send({ error: false, blog })
 
