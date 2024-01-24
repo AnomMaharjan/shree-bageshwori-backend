@@ -1,7 +1,7 @@
 import { Router } from "express";
 import Banner from "../models/Banner.js";
 import { bannerValidate } from "../utils/bannerValidator.js";
-import { upload, uploadBannerPhoto } from "../utils/cloudinaryHelper.js";
+import { deleteImage, upload, uploadBannerPhoto } from "../utils/cloudinaryHelper.js";
 const bannerRoutes = Router();
 
 //Get all banners
@@ -45,23 +45,24 @@ bannerRoutes.post("/", upload.single("image"), async (req, res) => {
         .send({ error: true, msg: error.details[0].message });
     }
 
-    var imageURLs = "";
+    var image;
     if (req.file) {
       const buf = Buffer.from(req.file.buffer).toString("base64");
       let dataURI = "data:" + req.file.mimetype + ";base64," + buf;
       let cldRes = await uploadBannerPhoto(dataURI);
-      imageURLs = cldRes.secure_url;
+      image = { imageUrl: cldRes.secure_url, publicId: cldRes.public_id };
     }
 
     const banner = new Banner({
       title: req.body.title,
       description: req.body.description,
-      imageUrl: imageURLs,
+      image: image,
     });
 
     await banner.save();
     return res.status(201).send({ error: false, banner });
   } catch (err) {
+    console.log(err)
     return res
       .status(500)
       .send({ error: true, message: "Internal Server Error." });
@@ -69,7 +70,7 @@ bannerRoutes.post("/", upload.single("image"), async (req, res) => {
 });
 
 //Update banner
-bannerRoutes.put("/:id", async (req, res) => {
+bannerRoutes.put("/:id", upload.single("image"), async (req, res) => {
   try {
     const { error } = bannerValidate(req.body);
     if (error)
@@ -77,12 +78,26 @@ bannerRoutes.put("/:id", async (req, res) => {
         .status(400)
         .send({ error: true, msg: error.details[0].message });
 
+
+    var image;
+    if (req.file) {
+      const buf = Buffer.from(req.file.buffer).toString("base64");
+      let dataURI = "data:" + req.file.mimetype + ";base64," + buf;
+      let cldRes = await uploadBannerPhoto(dataURI);
+      image = { imageUrl: cldRes.secure_url, publicId: cldRes.public_id };
+    }
+
+    const bannerImage = await Banner.findById(req.params.id);
+
+    await deleteImage(bannerImage.image.publicId)
+
     const banner = await Banner.findByIdAndUpdate(
       req.params.id,
       {
         title: req.body.title,
         description: req.body.description,
-        imageUrl: req.body.imageUrl,
+        image: image,
+
         createdAt: Date.now(),
       },
       { new: true }
@@ -108,6 +123,8 @@ bannerRoutes.delete("/:id", async (req, res) => {
       return res
         .status(400)
         .send({ error: true, msg: "Banner with the given id not found." });
+
+    await deleteImage(banner.image.publicId);
 
     return res.status(200).send({ error: false, banner });
   } catch (err) {

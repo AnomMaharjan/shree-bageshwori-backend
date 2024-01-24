@@ -2,7 +2,7 @@ import { Router } from "express";
 import Testimonial from "../models/Testimonial.js";
 import validateTestimonial from "../utils/testimonialValidator.js";
 import auth from "../middleware/auth.js";
-import { upload, uploadFeedbackPhoto } from "../utils/cloudinaryHelper.js";
+import { deleteImage, upload, uploadFeedbackPhoto } from "../utils/cloudinaryHelper.js";
 
 const testimonialRouter = Router()
 
@@ -43,13 +43,26 @@ testimonialRouter.post('/', auth, upload.single('image'), async (req, res) => {
 })
 
 
-testimonialRouter.put('/:id', auth, async (req, res) => {
+testimonialRouter.put('/:id', auth, upload.single('image'), async (req, res) => {
     try {
         const { error } = validateTestimonial(req.body)
         if (error) return res.status(400).send({ status: false, msg: error.details[0].message })
 
-        let testimonial = await Testimonial.findById(req.params.id, { ...req.body, createdAt: Date.now() }, { new: true })
-        if (!testimonial) return res.status(404).send({ status: false, msg: 'Testimonial with the given id not found' })
+
+        let testimonialImage = await Testimonial.findById(req.params.id);
+        if (!testimonialImage) return res.status(404).send({ status: false, msg: 'Testimonial with the given id not found' })
+
+        await deleteImage(testimonialImage.image.publicId);
+
+        const buf = Buffer.from(req.file.buffer).toString('base64')
+        let dataURI = "data:" + req.file.mimetype + ";base64," + buf
+        let cldRes = await uploadFeedbackPhoto(dataURI);
+
+        let testimonial = await Testimonial.findByIdAndUpdate(req.params.id, {
+            ...req.body,
+            image: { imageUrl: cldRes.secure_url, publicId: cldRes.public_id }, createdAt: Date.now()
+        }, { new: true })
+
 
         return res.status(200).send({ status: true, testimonial })
     }

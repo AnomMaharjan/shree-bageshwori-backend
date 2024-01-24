@@ -19,6 +19,7 @@ export const uploadBlogsPhotos = async (file) => {
       resource_type: "auto",
       folder: "blogs",
       use_filename: true,
+      limit: '5mb'
     });
     return Promise.resolve(res);
   } catch (error) {
@@ -32,6 +33,7 @@ export const uploadBannerPhoto = async (file) => {
       resource_type: "auto",
       folder: "banners",
       use_filename: true,
+      limit: '5mb'
     });
     return Promise.resolve(res);
   } catch (error) {
@@ -45,9 +47,20 @@ export const uploadFeedbackPhoto = async (file) => {
       resource_type: "auto",
       folder: "feedbacks",
       use_filename: true,
+      limit: '5mb'
     });
     return Promise.resolve(res);
   } catch (error) {
     return Promise.reject(error);
   }
+
 };
+
+export const deleteImage = async (publicId) => {
+  try {
+    const res = await cloudinary.uploader.destroy(publicId);
+    return Promise.resolve(res);
+  } catch (error) {
+    return Promise.reject(error);
+  }
+}
