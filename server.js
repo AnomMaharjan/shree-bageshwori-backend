@@ -8,6 +8,7 @@ import refreshRoutes from "./routes/refreshToken.js"
 import testimonialRouter from "./routes/testimonials.js";
 import blogsRouter from "./routes/blogs.js";
 import cors from "cors";
+import clientAPIRouter from "./routes/clientAPI.js";
 
 const app = express();
 //Loads .env file contents into process.env by default.
@@ -24,6 +25,7 @@ app.use("/api/banners", bannerRoutes);
 app.use('/api/plans', plansRouter)
 app.use('/api/testimonials', testimonialRouter)
 app.use('/api/blogs', blogsRouter)
+app.use('/api/fetchClientAPI', clientAPIRouter)
 
 
 const port = process.env.PORT || 8080
