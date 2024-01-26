@@ -1,7 +1,11 @@
 import { Router } from "express";
 import Banner from "../models/Banner.js";
 import { bannerValidate } from "../utils/bannerValidator.js";
-import { deleteImage, upload, uploadBannerPhoto } from "../utils/cloudinaryHelper.js";
+import {
+  deleteImage,
+  upload,
+  uploadBannerPhoto,
+} from "../utils/cloudinaryHelper.js";
 const bannerRoutes = Router();
 
 //Get all banners
@@ -56,13 +60,18 @@ bannerRoutes.post("/", upload.single("image"), async (req, res) => {
     const banner = new Banner({
       title: req.body.title,
       description: req.body.description,
+      subTitle: req.body.subTitle,
+      isLinkAttached: req.body.isLinkAttached,
+      linkUrl: req.body.linkUrl,
+      subTitleHighlights: JSON.parse(req.body.subTitleHighlights) || [],
+      titleHighlights: JSON.parse(req.body.titleHighlights) || [],
       image: image,
     });
 
     await banner.save();
     return res.status(201).send({ error: false, banner });
   } catch (err) {
-    console.log(err)
+    console.log(err);
     return res
       .status(500)
       .send({ error: true, message: "Internal Server Error." });
@@ -78,7 +87,6 @@ bannerRoutes.put("/:id", upload.single("image"), async (req, res) => {
         .status(400)
         .send({ error: true, msg: error.details[0].message });
 
-
     var image;
     if (req.file) {
       const buf = Buffer.from(req.file.buffer).toString("base64");
@@ -89,13 +97,18 @@ bannerRoutes.put("/:id", upload.single("image"), async (req, res) => {
 
     const bannerImage = await Banner.findById(req.params.id);
 
-    await deleteImage(bannerImage.image.publicId)
+    await deleteImage(bannerImage.image.publicId);
 
     const banner = await Banner.findByIdAndUpdate(
       req.params.id,
       {
         title: req.body.title,
         description: req.body.description,
+        subTitle: req.body.subTitle,
+        isLinkAttached: req.body.isLinkAttached,
+        linkUrl: req.body.linkUrl,
+        subTitleHighlights: JSON.parse(req.body.subTitleHighlights) || [],
+        titleHighlights: JSON.parse(req.body.titleHighlights) || [],
         image: image,
 
         createdAt: Date.now(),
